@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Minimum Viable Editor</title>
+    <meta
+      name="description"
+      content="A small React code editor: plaintext contenteditable, Lezer syntax highlighting, incremental parsing and rendering."
+    />
+    <meta name="color-scheme" content="light dark" />
+    <!-- Apply a saved theme before first paint so there is no flash. -->
+    <script>
+      try {
+        var theme = localStorage.getItem("mve-theme");
+        if (theme === "light" || theme === "dark") {
+          document.documentElement.classList.add("mve-" + theme);
+        }
+      } catch (_) {}
+    </script>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Minimum Viable Editor</h1>
+      <p class="tagline">
+        A small React code editor: plaintext <code>contenteditable</code>, Lezer highlighting,
+        incremental everything.
+      </p>
+
+      <!-- Live demo, mounted by React. Everything else is static HTML. -->
+      <div id="demo"></div>
+      <!-- Same shape as the mounted demo, removed once React takes over, so
+           the page does not jump. The <pre> is also the demo's initial text. -->
+      <div id="demo-static">
+        <nav>
+          <button disabled>javascript</button>
+          <button disabled>typescript</button>
+          <button disabled>json</button>
+          <button disabled>css</button>
+          <span class="spacer"></span>
+          <button disabled>system</button>
+          <button disabled>light</button>
+          <button disabled>dark</button>
+        </nav>
+        <pre class="editor">// Try typing, Tab, Enter, undo/redo.
+import { useState } from &quot;react&quot;;
+
+function Counter({ initial }, ...rest) {
+  const [n, setN] = useState(initial ?? 0);
+  return &lt;Button size={1} onClick={() =&gt; setN(n + 1)}&gt;{n &gt; 10 ? this.x : null}&lt;/Button&gt;;
+}</pre>
+        <p class="output">7 lines, 248 chars</p>
+      </div>
+
+      <article class="docs">
+        <h2>Install</h2>
+        <pre class="snippet" data-language="text">pnpm add @brijbyte/mve react</pre>
+
+        <h2>Usage</h2>
+        <p>
+          <code>Editor</code> is a controlled component: pass <code>value</code> and update it from
+          <code>onChange</code>. The theme stylesheet is optional but gives the <code>mve-*</code>
+          classes their colours.
+        </p>
+        <pre class="snippet" data-language="tsx">import { useState } from &quot;react&quot;;
+import { Editor } from &quot;@brijbyte/mve&quot;;
+import { javascript } from &quot;@brijbyte/mve/languages&quot;;
+import &quot;@brijbyte/mve/theme.css&quot;;
+
+// Build once: a new Language object means a full reparse.
+const JS = javascript();
+
+export function App() {
+  const [value, setValue] = useState(&quot;const answer = 42;&quot;);
+  return &lt;Editor value={value} onChange={setValue} language={JS} /&gt;;
+}</pre>
+
+        <h2>Languages</h2>
+        <p>
+          Built-in languages come from a separate entry so unused grammars stay out of your bundle,
+          and each one is also its own entry for lazy loading.
+        </p>
+        <pre class="snippet" data-language="tsx">import { css, javascript, json } from &quot;@brijbyte/mve/languages&quot;;
+
+javascript();      // plain JavaScript
+javascript(&quot;jsx&quot;); // with JSX
+javascript(&quot;ts&quot;);  // TypeScript
+javascript(&quot;tsx&quot;); // TypeScript + JSX
+json();
+css();
+
+// Each grammar is also its own entry, so it can be a lazy chunk.
+// This page does exactly that: no grammar ships until it is needed.
+const ts = await import(&quot;@brijbyte/mve/languages/javascript&quot;)
+  .then((m) =&gt; m.javascript(&quot;ts&quot;));</pre>
+
+        <h2>Custom languages</h2>
+        <p>
+          A <code>Language</code> is a Lezer parser plus optional <code>highlighter</code> and
+          <code>refine</code>. Anything from the <code>@lezer</code> ecosystem plugs in.
+        </p>
+        <pre class="snippet" data-language="tsx">import type { Language } from &quot;@brijbyte/mve&quot;;
+import { parser } from &quot;@lezer/python&quot;;
+
+// Any Lezer parser works. Tokens are classed by the default
+// highlighter unless you pass your own `highlighter`.
+const python: Language = { parser };
+
+// Optional: adjust classes from token text.
+const withBuiltins: Language = {
+  parser,
+  refine: (classes, text) =&gt;
+    classes === &quot;mve-v&quot; &amp;&amp; text === &quot;self&quot; ? &quot;mve-self&quot; : classes
+};</pre>
+
+        <h2>Theming</h2>
+        <p>
+          Colours are CSS variables, light by default. Dark applies under
+          <code>prefers-color-scheme: dark</code> or inside a <code>.mve-dark</code> ancestor;
+          <code>.mve-light</code> forces light. The buttons above toggle exactly that.
+        </p>
+        <pre class="snippet" data-language="css">/* Override any --mve-* variable; light values live on :root. */
+:root {
+  --mve-k: #8250df;
+  --mve-s: #0a3069;
+}
+
+/* Force a palette on a subtree, or let prefers-color-scheme decide. */
+.mve-dark { --mve-bg: #0d1117; }
+.mve-light { --mve-bg: #ffffff; }
+
+/* The root element carries .mve; size and font are yours. */
+.mve {
+  font-family: ui-monospace, monospace;
+  font-size: 14px;
+  padding: 0.75rem;
+}</pre>
+
+        <h2>Props</h2>
+        <p>
+          Remaining props spread onto the root <code>div</code>, so <code>className</code>,
+          <code>style</code> and event handlers work as usual.
+        </p>
+        <pre class="snippet" data-language="tsx">interface EditorProps extends HTMLAttributes&lt;HTMLDivElement&gt; {
+  value: string;                      // controlled text
+  onChange?: (value: string) =&gt; void; // fires on every edit, undo and redo
+  language?: Language | null;         // null renders plain text
+  indent?: string;                    // inserted on Tab, default two spaces
+}</pre>
+
+        <h2>Bundle size</h2>
+        <p>
+          The first row is what every install pays: the editor, its React wrapper and the Lezer
+          runtime (<code>@lezer/common</code>, <code>@lezer/highlight</code>, <code>@lezer/lr</code>).
+          Grammars are added per language; import only the ones you use from
+          <code>@brijbyte/mve/languages</code> and tree shaking drops the rest, or load
+          <code>@brijbyte/mve/languages/&lt;name&gt;</code> on demand as this page does. React is a
+          peer dependency and not counted. Measured with rolldown, minified and gzipped.
+        </p>
+        <table class="sizes">
+          <thead>
+            <tr><th>Part</th><th>Minified</th><th>Gzipped</th></tr>
+          </thead>
+          <tbody>
+          <tr><td>Editor core + React wrapper + Lezer runtime</td><td>65.6 kB</td><td>21.3 kB</td></tr>
+          <tr><td>javascript() incl. TypeScript and JSX</td><td>76.9 kB</td><td>30.3 kB</td></tr>
+          <tr><td>json()</td><td>1.7 kB</td><td>1.1 kB</td></tr>
+          <tr><td>css()</td><td>16.7 kB</td><td>7.8 kB</td></tr>
+          <tr class="total"><td>Everything above</td><td>161.2 kB</td><td>59.8 kB</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Compared with react-simple-code-editor</h3>
+        <p>
+          <code>react-simple-code-editor</code> (0.14) with Prism (1.30) is the usual lightweight
+          choice. It is much smaller: Prism grammars are regular expressions, while Lezer ships a
+          real parser that builds a syntax tree and re-parses incrementally, which is what keeps large
+          documents responsive here. Same measurement, React excluded.
+        </p>
+        <table class="sizes">
+          <thead>
+            <tr><th>Part</th><th>Minimum Viable Editor</th><th>react-simple-code-editor + Prism</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Editor + highlighter runtime</td><td>21.3 kB</td><td>6.6 kB</td></tr>
+            <tr><td>JavaScript + TypeScript + JSX</td><td>30.3 kB</td><td>3.7 kB</td></tr>
+            <tr><td>CSS</td><td>7.8 kB</td><td>0.6 kB</td></tr>
+            <tr><td>JSON</td><td>1.1 kB</td><td>0.3 kB</td></tr>
+          </tbody>
+        </table>
+        <p>Gzipped. Prism grammar rows are the increase over the core bundle.</p>
+
+        <h2>Why not Prism + react-simple-code-editor</h2>
+        <p>It is a quarter of the size, so the question is fair. What the extra bytes buy:</p>
+        <ul>
+          <li>
+            <strong>Correct tokens.</strong> Lezer parses the language; Prism matches regular
+            expressions. Regex highlighting guesses at anything context-dependent: <code>/</code> as
+            division or regexp, <code>&lt;T&gt;</code> as generic or JSX, expressions inside template
+            literals, nested comments and strings. A parser gets these right and recovers from
+            incomplete code as you type.
+          </li>
+          <li>
+            <strong>Per-edit cost.</strong> Prism re-tokenises the whole document on every keystroke
+            and react-simple-code-editor re-renders the whole highlighted block. Here the browser edits
+            the line, Lezer reparses only what changed, and only lines whose tokens changed are
+            swapped: on a 20k-line file a keystroke touches one line and stays around 11 ms.
+          </li>
+          <li>
+            <strong>One DOM layer.</strong> react-simple-code-editor keeps a transparent
+            <code>textarea</code> over a highlighted <code>pre</code> and relies on both staying
+            pixel-aligned; wrapping, scrolling, fonts and IME each have a way to break that. This
+            editor edits the highlighted DOM directly: one element, native selection, native
+            find-in-page, one textbox for assistive technology.
+          </li>
+          <li>
+            <strong>Richer classes.</strong> Parameters, definitions, calls, property access,
+            operator kinds, JSX tags versus components and built-in types are distinct classes, so
+            themes can look like an editor's rather than a blog's code block.
+          </li>
+          <li>
+            <strong>The Lezer ecosystem.</strong> Any <code>@lezer</code> grammar, including the ones
+            CodeMirror uses, plugs in as a <code>Language</code>. The syntax tree is there for
+            folding, indentation or linting later.
+          </li>
+        </ul>
+        <p>
+          Pick Prism + react-simple-code-editor when the code is short, a wrong token now and then
+          is fine, and every kilobyte matters. Pick this when the document can get long or the
+          highlighting has to be right.
+        </p>
+
+        <h2>Editing behaviour</h2>
+        <ul>
+          <li>Enter keeps the current line's indentation.</li>
+          <li>Tab inserts <code>indent</code>. Paste inserts plain text.</li>
+          <li>Undo and redo (Cmd/Ctrl+Z, Shift+Cmd/Ctrl+Z, Ctrl+Y) are handled by the editor.</li>
+          <li>
+            Work per keystroke is proportional to the edit: only touched lines are read back,
+            reparsed and re-rendered.
+          </li>
+        </ul>
+      </article>
+    </main>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

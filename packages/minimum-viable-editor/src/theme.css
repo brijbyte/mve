@@ -1,0 +1,139 @@
+/*
+ * Default theme for the built-in `mve-*` classes, modelled on GitHub's
+ * syntax palettes (starry-night `style/light.css` and `style/dark.css`).
+ *
+ * Light is the default. Dark applies under `prefers-color-scheme: dark`
+ * or inside any `.mve-dark` ancestor; `.mve-light` forces light.
+ * Override the `--mve-*` variables to retheme without touching selectors.
+ */
+
+:root,
+.mve-light {
+  --mve-bg: #ffffff;
+  --mve-fg: #1f2328;
+  --mve-c: #59636e;
+  --mve-const: #0550ae;
+  --mve-ent: #6639ba;
+  --mve-tag: #0550ae;
+  --mve-k: #cf222e;
+  --mve-s: #0a3069;
+  --mve-re: #116329;
+  --mve-var: #953800;
+  --mve-ab: #59636e;
+  --mve-link: #0a3069;
+  --mve-h: #0550ae;
+  --mve-ins: #116329;
+  --mve-ins-bg: #dafbe1;
+  --mve-del: #82071e;
+  --mve-del-bg: #ffebe9;
+  --mve-inv: #f6f8fa;
+  --mve-inv-bg: #82071e;
+}
+
+.mve-dark {
+  --mve-bg: #0d1117;
+  --mve-fg: #f0f6fc;
+  --mve-c: #9198a1;
+  --mve-const: #79c0ff;
+  --mve-ent: #d2a8ff;
+  --mve-tag: #7ee787;
+  --mve-k: #ff7b72;
+  --mve-s: #a5d6ff;
+  --mve-re: #7ee787;
+  --mve-var: #ffa657;
+  --mve-ab: #9198a1;
+  --mve-link: #a5d6ff;
+  --mve-h: #1f6feb;
+  --mve-ins: #aff5b4;
+  --mve-ins-bg: #033a16;
+  --mve-del: #ffdcd7;
+  --mve-del-bg: #67060c;
+  --mve-inv: #f0f6fc;
+  --mve-inv-bg: #8e1519;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.mve-light) {
+    --mve-bg: #0d1117;
+    --mve-fg: #f0f6fc;
+    --mve-c: #9198a1;
+    --mve-const: #79c0ff;
+    --mve-ent: #d2a8ff;
+    --mve-tag: #7ee787;
+    --mve-k: #ff7b72;
+    --mve-s: #a5d6ff;
+    --mve-re: #7ee787;
+    --mve-var: #ffa657;
+    --mve-ab: #9198a1;
+    --mve-link: #a5d6ff;
+    --mve-h: #1f6feb;
+    --mve-ins: #aff5b4;
+    --mve-ins-bg: #033a16;
+    --mve-del: #ffdcd7;
+    --mve-del-bg: #67060c;
+    --mve-inv: #f0f6fc;
+    --mve-inv-bg: #8e1519;
+  }
+}
+
+/* editor root */
+.mve { color: var(--mve-fg); background: var(--mve-bg); }
+
+/* comment */
+.mve-c { color: var(--mve-c); }
+
+/* constant: literals, keys, built-in types */
+.mve-n,
+.mve-b,
+.mve-nil,
+.mve-atom,
+.mve-lit,
+.mve-col,
+.mve-p.mve-def,
+.mve-t.mve-bi { color: var(--mve-const); }
+
+/* entity: functions, classes, types, attributes, components */
+.mve-f,
+.mve-f.mve-p,
+.mve-cls,
+.mve-t,
+.mve-ns,
+.mve-lbl,
+.mve-mac,
+.mve-attr,
+.mve-tag.mve-comp { color: var(--mve-ent); }
+
+/* entity tag */
+.mve-tag { color: var(--mve-tag); }
+
+/* keyword: keywords, `this`, operators, units, meta */
+.mve-k,
+.mve-self,
+.mve-o,
+.mve-u,
+.mve-meta { color: var(--mve-k); }
+
+/* string */
+.mve-s,
+.mve-av,
+.mve-re { color: var(--mve-s); }
+.mve-esc { color: var(--mve-re); font-weight: bold; }
+
+/* variable: parameters */
+.mve-v.mve-param { color: var(--mve-var); }
+
+/* plain text: variables (declared or used), imports, property access, punctuation */
+.mve-v,
+.mve-p,
+.mve-pu { color: var(--mve-fg); }
+.mve-ab { color: var(--mve-ab); }
+
+/* markup */
+.mve-url,
+.mve-link { color: var(--mve-link); text-decoration: underline; }
+.mve-h { color: var(--mve-h); font-weight: bold; }
+.mve-st { color: var(--mve-fg); font-weight: bold; }
+.mve-em { color: var(--mve-fg); font-style: italic; }
+.mve-ins { color: var(--mve-ins); background: var(--mve-ins-bg); }
+.mve-del { color: var(--mve-del); background: var(--mve-del-bg); }
+.mve-inv { color: var(--mve-inv); background: var(--mve-inv-bg); }

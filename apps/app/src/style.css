@@ -1,0 +1,154 @@
+@import "@brijbyte/mve/theme.css";
+
+/* Page chrome follows the editor palette so the toggle themes everything. */
+
+:root,
+.mve-light {
+  --page-bg: #f6f8fa;
+  --page-border: #d1d9e0;
+  --page-focus: #0969da;
+  color-scheme: light;
+}
+
+.mve-dark {
+  --page-bg: #010409;
+  --page-border: #3d444d;
+  --page-focus: #58a6ff;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.mve-light) {
+    --page-bg: #010409;
+    --page-border: #3d444d;
+    --page-focus: #58a6ff;
+    color-scheme: dark;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  color: var(--mve-fg);
+  background: var(--page-bg);
+}
+
+main {
+  max-width: 48rem;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+nav {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.editor {
+  min-height: 12rem;
+  padding: 0.75rem;
+  border: 1px solid var(--page-border);
+  border-radius: 6px;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  tab-size: 2;
+}
+
+.editor:focus {
+  outline: 2px solid var(--page-focus);
+  outline-offset: -1px;
+}
+
+.output {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border: 1px solid var(--page-border);
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.tagline {
+  margin: -0.5rem 0 1.5rem;
+  color: var(--mve-c);
+}
+
+.docs h2 {
+  margin: 2rem 0 0.5rem;
+  font-size: 1.25rem;
+}
+
+.docs h3 {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1rem;
+}
+
+.docs p,
+.docs li {
+  line-height: 1.6;
+}
+
+.docs code {
+  padding: 0.1em 0.3em;
+  border-radius: 4px;
+  background: var(--page-bg);
+  border: 1px solid var(--page-border);
+  font-size: 0.9em;
+}
+
+.snippet {
+  min-height: 0;
+  margin: 0.5rem 0 1rem;
+}
+
+.sizes {
+  width: 100%;
+  margin: 0.5rem 0 1rem;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.sizes th,
+.sizes td {
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--page-border);
+  text-align: left;
+}
+
+.sizes td:not(:first-child),
+.sizes th:not(:first-child) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.sizes .total td {
+  font-weight: 600;
+}
+
+/* Static placeholders before React upgrades them: same box as .editor. */
+pre.editor,
+pre.snippet {
+  margin: 0;
+  color: var(--mve-fg);
+  background: var(--mve-bg);
+  white-space: pre-wrap;
+}
+
+pre.snippet {
+  margin: 0.5rem 0 1rem;
+  padding: 0.75rem;
+  border: 1px solid var(--page-border);
+  border-radius: 6px;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.docs strong {
+  font-weight: 600;
+}

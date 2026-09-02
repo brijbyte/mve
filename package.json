@@ -1,0 +1,10 @@
+{
+  "name": "minimum-viable-editor-workspace",
+  "private": true,
+  "packageManager": "pnpm@11.25.0",
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm --filter app dev",
+    "preview": "pnpm --filter app preview"
+  }
+}
