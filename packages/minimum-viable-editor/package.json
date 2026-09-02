@@ -1,7 +1,11 @@
 {
   "name": "@brijbyte/mve",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brijbyte/mve.git"
+  },
   "publishConfig": {
     "access": "public"
   },
